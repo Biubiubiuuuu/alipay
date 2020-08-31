@@ -9,10 +9,10 @@ import (
 	"time"
 )
 
-// 发送GET请求
-// url：         请求地址
-// response：    请求返回的内容
-func HttpGet(url string) string {
+// HTTPGet 发送GET请求
+// 	url：         请求地址
+// 	response：    请求返回的内容
+func HTTPGet(url string) string {
 	// 超时时间：20秒
 	client := &http.Client{Timeout: 20 * time.Second}
 	resp, err := client.Get(url)
@@ -34,11 +34,11 @@ func HttpGet(url string) string {
 	return result.String()
 }
 
-// 发送POST请求
+// HTTPPost 发送POST请求
 // url：         请求地址
 // contentType： 内容类型（默认：application/x-www-form-urlencoded）
 // response：    请求返回的内容
-func HttpPost(url string, contentType string, postData string) string {
+func HTTPPost(url string, contentType string, postData string) string {
 	if contentType == "" {
 		contentType = "application/x-www-form-urlencoded"
 	}

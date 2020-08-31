@@ -23,3 +23,5 @@ replace (
 	google.golang.org/genproto => github.com/google/go-genproto v0.0.0-20191028173616-919d9bdd9fe6
 	google.golang.org/grpc => github.com/grpc/grpc-go v1.24.0
 )
+
+require github.com/pkg/errors v0.9.1
