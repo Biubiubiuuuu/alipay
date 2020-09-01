@@ -1,6 +1,7 @@
 package alipay
 
 import (
+	"crypto"
 	"encoding/json"
 	"fmt"
 	"net/url"
@@ -24,19 +25,20 @@ func GetAuth() (string, error) {
 	return m["app_auth_code"][0], nil
 }
 
-// BaseReq 公共请求参数
+// CommonReq 公共请求参数
 // ced30c44a01f4b47b3ee4a873d7dTD04
-type BaseReq struct {
+type CommonReq struct {
 	AppID        string `json:"app_id"`         // 开发者应用ID
 	Method       string `json:"method"`         // 接口名称
 	Format       string `json:"format"`         // 请求结构数据类型 仅支持JSON
 	Charset      string `json:"charset"`        // 请求使用的编码格式，如utf-8,gbk,gb2312等 默认utf-8
-	SignYype     string `json:"sign_type"`      // 签名算法类型 RSA2和RSA 默认RSA2
+	SignType     string `json:"sign_type"`      // 签名算法类型 RSA2和RSA 默认RSA2
 	Sign         string `json:"sign"`           // 签名串
 	Timestamp    string `json:"timestamp"`      // 请求时间 格式 yyyy-MM-dd HH:mm:ss
 	Version      string `json:"version"`        // 接口版本 1.0
+	NotifyURL    string `json:"notify_url"`     // 支付宝服务器主动通知商户服务器里指定的页面http/https路径
 	AppAuthToken string `json:"app_auth_token"` // 应用授权app_auth_token
-	BizContent   string `json:"biz_content"`    // 	请求参数的集合
+	BizContent   string `json:"biz_content"`    // 请求参数的集合
 }
 
 // GetAccessTokenReq 换取授权访问令牌请求参数
@@ -48,25 +50,35 @@ type GetAccessTokenReq struct {
 
 // GetAccessToken 获取授权token
 func GetAccessToken() {
-	// 签名字符串
-	sign := ""
 	req := GetAccessTokenReq{
 		GrantType:    "authorization_code",
-		Code:         "353f0f6d3c0a4eeeaef96684016e6X40",
+		Code:         "20bfe09c6bf64f3d951526ee3891cD40",
 		RefreshToken: "",
 	}
 	bizContent, _ := json.Marshal(req)
-	baseReq := BaseReq{
+	commonReq := CommonReq{
 		AppID:        AppID,
-		Method:       "alipay.system.oauth.token",
+		Method:       "alipay.open.auth.token.app",
 		Format:       "JSON",
-		Charset:      "utf-8",
-		SignYype:     "RSA2",
-		Sign:         sign,
+		Charset:      "UTF-8",
+		SignType:     "RSA2",
 		Timestamp:    time.Now().Format("2006-01-02 15:04:05"),
 		Version:      "1.0",
-		AppAuthToken: "353f0f6d3c0a4eeeaef96684016e6X40",
+		AppAuthToken: "",
 		BizContent:   string(bizContent),
 	}
-
+	signStr, _ := SignStr(commonReq, GetAccessTokenReq{}, false)
+	fmt.Println("signStr+++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+	fmt.Println(signStr)
+	sign := RsaSign(signStr, AppPrivateKey, crypto.SHA256)
+	fmt.Println("sign+++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+	fmt.Println(sign)
+	commonReq.Sign = sign
+	fmt.Println("commonReq++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+	fmt.Println(commonReq)
+	postData, _ := SignStr(commonReq, GetAccessTokenReq{}, true)
+	fmt.Println("postData+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+	fmt.Println(postData)
+	resp := HTTPPost(APIUrl, "", postData)
+	fmt.Println(resp)
 }
