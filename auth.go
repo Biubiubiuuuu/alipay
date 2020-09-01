@@ -52,7 +52,7 @@ type GetAccessTokenReq struct {
 func GetAccessToken() {
 	req := GetAccessTokenReq{
 		GrantType:    "authorization_code",
-		Code:         "20bfe09c6bf64f3d951526ee3891cD40",
+		Code:         "7bb7cbe5ebcc4c7ba75b390b90e0fX40",
 		RefreshToken: "",
 	}
 	bizContent, _ := json.Marshal(req)
